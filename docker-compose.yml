@@ -1,8 +1,6 @@
-version: '2'
-
 services:
   sonarqube:
-    image: sonarqube
+    image: sonarqube:9.9.4-community
     ports:
       - '9000:9000'
     networks:
@@ -11,6 +9,10 @@ services:
       - sonar.jdbc.username=sonar
       - sonar.jdbc.password=sonar
       - sonar.jdbc.url=jdbc:postgresql://db:5432/sonar
+      - SONAR_SEARCH_JAVAADDITIONALOPTS=-Dbootstrap.system_call_filter=false
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    security_opt:
+      - seccomp:unconfined
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
@@ -20,7 +22,7 @@ services:
        soft: 65536
        hard: 65536
   db:
-    image: postgres
+    image: public.ecr.aws/docker/library/postgres:13-alpine
     networks:
       - sonarnet
     environment:
